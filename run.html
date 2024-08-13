@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D Cocktail Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .result {
+            margin: 20px 0;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>D&D Cocktail Generator</h1>
+    <button onclick="generateDrink()">Roll for Drink</button>
+    <div id="result" class="result"></div>
+
+    <script>
+        const baseSpiritTable = ["Tequila Blanco", "Tequila Reposado", "Tequila Añejo", "Tequila Extra Añejo", "Mezcal"];
+        const ginTable = ["London Dry Gin", "Plymouth Gin", "Old Tom Gin", "Navy Strength Gin", "Botanical Gin"];
+        const rumTable = ["White Rum", "Dark Rum", "Aged Rum", "Overproof Rum", "Rum Agricole", "Cachaça"];
+        const brandyTable = ["Apple Brandy", "Calvados", "Cognac", "Pisco"];
+        const whiskeyTable = ["Bourbon", "Rye Whiskey", "Scotch Whisky", "Irish Whiskey", "Japanese Whisky", "Canadian Whisky"];
+
+        const sweetenerTable = ["Simple Syrup", "Flavored Syrup", "Liqueur", "Sugar", "Amaro", "Two Sweets"];
+        const bittersTable = ["Lemon Bitters", "Mole Bitters", "Juniper Bitters", "Root Beer Bitters", "Whiskey Smoke Bitters", "Ginger Bitters", "Rhubarb Bitters", "Aztec Chocolate Bitters", "Plum Bitters", "Whiskey Barrel Aged Bitters", "Grapefruit Bitters", "Pear Bitters", "Orange Bitters", "Lime Bitters", "Cherry Bark Vanilla Bitters", "Aromatic Bitters", "Peychaud's Bitters", "Cherry Bitters", "Archangelika and Anise Bitters", "Woodford Reserve Chocolate Bitters", "Woodford Reserve Orange Bitters", "Bittercube Black Strap Bitters", "Cinnamon Bitters", "Mint Bitters", "Roll Twice on This Table"];
+
+        const amaroTable = ["Amaro Montenegro", "Cynar", "Amaro Nonino", "Licor 43", "Amaro Istriano", "Licor Beirão", "Amaro Sibona", "Luxardo Amaro Abano", "Amara", "Amaro Lucano", "Lazzaroni Liquore Amaro", "Zucca", "Vecchio Amaro Del Capo", "Amaro d'Erbe", "Belle de Brillet", "Campari", "Aperol", "Strega Alberti Benevento", "Green Chartreuse", "Yellow Chartreuse", "The King's Ginger", "D.O.M. Benedictine", "Saint Elizabeth Allspice", "Jägermeister"];
+
+        const liqueurTable = ["Ancho Reyes Chili (Green)", "Ancho Reyes Chili (Red)", "Pimm's", "Pomegranate", "Saint Germain", "Creme de Cacao", "Cointreau", "Luxardo Cherry", "Phillips Butterscotch Ripple", "Mr Black Coffee", "Southern Comfort", "Raspberry Sourpuss", "Green Creme de Menthe", "Midori Melon Liqueur", "Cherry Brandy", "Kahlua", "Butterscotch", "Banana Liqueur", "Dry Curacao", "Dry Curacao Yuzu", "Apple Schnapps", "Maraschino Liqueur"];
+
+        const syrupTable = ["Maple Syrup", "Agave Syrup", "Honey Syrup", "Orgeat Syrup", "Cherry Syrup"];
+
+        const garnishTable = ["Cherry", "Orange Oil", "Grapefruit Oil", "Absinthe Wash"];
+
+        function rollDice(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+        function rollTable(table) {
+            return table[rollDice(table.length)];
+        }
+
+        function rollForCategory() {
+            return rollDice(2) === 1; // 50% chance to include the category
+        }
+
+        function generateDrink() {
+            const baseSpirit = rollTable(baseSpiritTable);
+            let sweetener = rollForCategory() ? rollTable(sweetenerTable) : "None";
+            let bitters = rollForCategory() ? rollTable(bittersTable) : "None";
+            let amaro = rollForCategory() ? rollTable(amaroTable) : "None";
+            let liqueur = rollForCategory() ? rollTable(liqueurTable) : "None";
+            let syrup = rollForCategory() ? rollTable(syrupTable) : "None";
+
+            const mandatoryTables = [sweetener, bitters, amaro, liqueur, syrup].filter(item => item !== "None");
+
+            // Ensure at least one or two of these categories are always rolled
+            if (mandatoryTables.length === 0) {
+                sweetener = rollTable(sweetenerTable);
+            } else if (mandatoryTables.length === 1) {
+                bitters = rollTable(bittersTable);
+            }
+
+            const garnish = rollTable(garnishTable);
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h2>Your Cocktail</h2>
+                <p><strong>Base Spirit:</strong> ${baseSpirit}</p>
+                <p><strong>Sweetener:</strong> ${sweetener}</p>
+                <p><strong>Bitters:</strong> ${bitters}</p>
+                <p><strong>Amaro / Aperitif:</strong> ${amaro}</p>
+                <p><strong>Liqueur:</strong> ${liqueur}</p>
+                <p><strong>Syrup:</strong> ${syrup}</p>
+                <p><strong>Garnish:</strong> ${garnish}</p>
+                <h3>Final Recipe</h3>
+                <p>Combine 2 oz of ${baseSpirit} with ${sweetener !== "None" ? "1/4 oz of " + sweetener : "no sweetener"}.</p>
+                ${bitters !== "None" ? `<p>Add 2-3 dashes of ${bitters}.</p>` : ""}
+                ${amaro !== "None" ? `<p>Stir in 1/4 oz of ${amaro}.</p>` : ""}
+                ${liqueur !== "None" ? `<p>Stir in 1/4 oz of ${liqueur}.</p>` : ""}
+                ${syrup !== "None" ? `<p>Add a touch of ${syrup}.</p>` : ""}
+                <p>Serve over ice and garnish with ${garnish}.</p>
+            `;
+        }
+    </script>
+
+</body>
+</html>
